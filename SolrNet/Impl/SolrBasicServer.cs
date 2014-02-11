@@ -134,5 +134,19 @@ namespace SolrNet.Impl {
         {
             return this.queryExecuter.Execute(query, options);
         }
+
+        /// <summary>
+        /// Executes multiple queries using a custom "/multi" search handler.
+        /// See https://issues.apache.org/jira/browse/SOLR-1093 for details on underlying 
+        /// org.apache.solr.handler.component.MultiSearchHandler implemantation.
+        /// </summary>
+        /// <param name="query">The queries.</param>
+        /// <param name="options">The query options.</param>
+        /// <returns>A list of <see cref="SolrQueryResults{T}"/>.</returns>
+        public IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiSearchHandlerQuery query, QueryOptions options)
+        {
+            return this.queryExecuter.Execute(query, options);
+
+        }
     }
 }

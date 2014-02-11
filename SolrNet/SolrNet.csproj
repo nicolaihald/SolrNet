@@ -93,7 +93,9 @@
     <Compile Include="Impl\FieldParsers\LocationFieldParser.cs" />
     <Compile Include="Impl\FieldParsers\MoneyFieldParser.cs" />
     <Compile Include="Impl\FieldSerializers\DateTimeOffsetFieldSerializer.cs" />
+    <Compile Include="Impl\ISolrMultiSearchHandlerResponseParser.cs" />
     <Compile Include="Impl\QuerySerializers\QueryByFieldRegexSerializer.cs" />
+    <Compile Include="Impl\ResponseParsers\MultiSearchHandlerResponseParser.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Money.cs" />
     <Compile Include="ExtractField.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="Impl\ResponseParsers\GroupingResponseParser.cs" />
     <Compile Include="SolrFacetPivotQuery.cs" />
     <Compile Include="SolrMoreLikeThisHandlerQuery.cs" />
+    <Compile Include="SolrMultiSearchHandlerQuery.cs" />
     <Compile Include="SolrMoreLikeThisHandlerStreamBodyQuery.cs" />
     <Compile Include="SolrMoreLikeThisHandlerStreamUrlQuery.cs" />
     <Compile Include="SolrQueryByDistance.cs" />
@@ -359,6 +362,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Impl\Multi\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

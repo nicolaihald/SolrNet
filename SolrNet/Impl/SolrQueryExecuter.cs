@@ -32,6 +32,7 @@ namespace SolrNet.Impl {
     /// <typeparam name="T">Document type</typeparam>
     public class SolrQueryExecuter<T> : ISolrQueryExecuter<T> {
         private readonly ISolrAbstractResponseParser<T> resultParser;
+        private readonly ISolrMultiSearchHandlerResponseParser<T> multiSearchResultParser;
         private readonly ISolrMoreLikeThisHandlerQueryResultsParser<T> mlthResultParser;
         private readonly ISolrConnection connection;
         private readonly ISolrQuerySerializer querySerializer;
@@ -58,6 +59,11 @@ namespace SolrNet.Impl {
         public static readonly string DefaultMoreLikeThisHandler = "/mlt";
 
         /// <summary>
+        /// Default Solr handler for Multi queries.
+        /// </summary>
+        public static readonly string DefaultMultiSearchHandler = "/multi";
+
+        /// <summary>
         /// Solr query request handler to use. By default "/select"
         /// </summary>
         public string Handler { get; set; }
@@ -75,9 +81,11 @@ namespace SolrNet.Impl {
         /// <param name="querySerializer"></param>
         /// <param name="facetQuerySerializer"></param>
         /// <param name="mlthResultParser"></param>
-        public SolrQueryExecuter(ISolrAbstractResponseParser<T> resultParser, ISolrConnection connection, ISolrQuerySerializer querySerializer, ISolrFacetQuerySerializer facetQuerySerializer, ISolrMoreLikeThisHandlerQueryResultsParser<T> mlthResultParser) {
+        /// <param name="multiSearchResultParser"></param>
+        public SolrQueryExecuter(ISolrAbstractResponseParser<T> resultParser, ISolrConnection connection, ISolrQuerySerializer querySerializer, ISolrFacetQuerySerializer facetQuerySerializer, ISolrMoreLikeThisHandlerQueryResultsParser<T> mlthResultParser, ISolrMultiSearchHandlerResponseParser<T> multiSearchResultParser) {
             this.resultParser = resultParser;
             this.mlthResultParser = mlthResultParser;
+            this.multiSearchResultParser = multiSearchResultParser;
             this.connection = connection;
             this.querySerializer = querySerializer;
             this.facetQuerySerializer = facetQuerySerializer;
@@ -588,6 +596,31 @@ namespace SolrNet.Impl {
             var r = connection.Get(handler, param);
             var xml = XDocument.Parse(r);
             resultParser.Parse(xml, results);
+            return results;
+        }
+
+        /// <summary>
+        /// Executes MultiSearch handler query (multiple queries in a single request) and returns multiple results.       
+        /// </summary>
+        /// <param name="query">A <see cref="SolrMultiSearchHandlerQuery"/> containing one or multiple queries.</param>
+        /// <param name="sharedOptions">The <see cref="QueryOptions"/> shared by all the wrapped queries.</param>
+        /// <returns>A list of SolrQueryResults{T} - one resultset for each query.</returns>
+        public IEnumerable<SolrQueryResults<T>> Execute(SolrMultiSearchHandlerQuery query, QueryOptions sharedOptions) {
+            
+            var results = new List<SolrQueryResults<T>>();
+            var param = GetAllParameters(query.Query, sharedOptions);
+            var handler = DefaultMultiSearchHandler;
+
+            if (sharedOptions != null && sharedOptions.ExtraParams != null)
+            {
+                var qt = sharedOptions.ExtraParams.SingleOrDefault(x => x.Key == "qt");
+                handler = qt.Value ?? Handler;
+            }
+
+            var r = connection.Get(handler, param);
+            var xml = XDocument.Parse(r);
+            multiSearchResultParser.Parse(xml, results);
+
             return results;
         }
 

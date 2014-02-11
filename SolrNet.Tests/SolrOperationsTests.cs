@@ -344,7 +344,7 @@ namespace SolrNet.Tests {
             var mlthParser = new MSolrMoreLikeThisHandlerQueryResultsParser<TestDocumentWithUniqueKey>();
             mlthParser.parse += _ => new SolrMoreLikeThisHandlerResults<TestDocumentWithUniqueKey>();
 
-            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(null, connection, querySerializer, null, mlthParser);
+            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(null, connection, querySerializer, null, mlthParser, null);
             var solr = new SolrBasicServer<TestDocumentWithUniqueKey>(connection, executer, null, null, null, null, null, null);
             var r = solr.MoreLikeThis(new SolrMoreLikeThisHandlerQuery(new SolrQuery(qstring)), new MoreLikeThisHandlerQueryOptions(new MoreLikeThisHandlerParameters(new[] { "id" }) { MatchInclude = true }));
             Assert.AreEqual(1, connection.get.Calls);
@@ -373,7 +373,7 @@ namespace SolrNet.Tests {
             var resultParser = new MSolrAbstractResponseParser<TestDocumentWithUniqueKey>();
             resultParser.parse &= x => x.Stub();
 
-            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(resultParser, connection, querySerializer, null, null);
+            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(resultParser, connection, querySerializer, null, null, null);
             var solr = new SolrBasicServer<TestDocumentWithUniqueKey>(connection, executer, null, null, null, null, null, null);
             var r = solr.Query(new SolrQuery(qstring), new QueryOptions { Start = start, Rows = rows });
 
@@ -402,7 +402,7 @@ namespace SolrNet.Tests {
             var resultParser = new MSolrAbstractResponseParser<TestDocumentWithUniqueKey>();
             resultParser.parse &= x => x.Stub();
 
-            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(resultParser, connection, querySerializer, null, null);
+            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(resultParser, connection, querySerializer, null, null, null);
             var solr = new SolrBasicServer<TestDocumentWithUniqueKey>(connection, executer, null, null, null, null, null, null);
             var r = solr.Query(new SolrQuery(qstring),
                                new QueryOptions {
@@ -440,7 +440,7 @@ namespace SolrNet.Tests {
             var resultParser = new MSolrAbstractResponseParser<TestDocumentWithUniqueKey>();
             resultParser.parse &= x => x.Stub();
 
-            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(resultParser, connection, querySerializer, null, null);
+            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(resultParser, connection, querySerializer, null, null, null);
             var solr = new SolrBasicServer<TestDocumentWithUniqueKey>(connection, executer, null, null, null, null, null, null);
             var r = solr.Query(new SolrQuery(qstring), new QueryOptions {
                 Start = start,
@@ -474,7 +474,7 @@ namespace SolrNet.Tests {
             var facetQuerySerializer = new DefaultFacetQuerySerializer(querySerializer, new DefaultFieldSerializer());
             var parser = new MSolrAbstractResponseParser<TestDocumentWithUniqueKey>();
             parser.parse &= x => x.Stub();
-            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(parser, connection, querySerializer, facetQuerySerializer, null);
+            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(parser, connection, querySerializer, facetQuerySerializer, null, null);
             var solr = new SolrBasicServer<TestDocumentWithUniqueKey>(connection, executer, null, null, null, null, null, null);
             var r = solr.Query(new SolrQuery(""), new QueryOptions {
                 Facet = new FacetParameters {
@@ -509,7 +509,7 @@ namespace SolrNet.Tests {
             querySerializer.serialize += _ => "";
             var facetQuerySerializer = new DefaultFacetQuerySerializer(querySerializer, new DefaultFieldSerializer());
 
-            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(parser, connection, querySerializer, facetQuerySerializer, null);
+            var executer = new SolrQueryExecuter<TestDocumentWithUniqueKey>(parser, connection, querySerializer, facetQuerySerializer, null, null);
             var solr = new SolrBasicServer<TestDocumentWithUniqueKey>(connection, executer, null, null, null, null, null, null);
             var r = solr.Query(new SolrQuery(""), new QueryOptions {
                 Facet = new FacetParameters {

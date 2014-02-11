@@ -286,5 +286,10 @@ namespace SolrNet.Impl {
         public SolrMoreLikeThisHandlerResults<T> MoreLikeThis(SolrMLTQuery query, MoreLikeThisHandlerQueryOptions options) {
             return basicServer.MoreLikeThis(query, options);
         }
+
+        public IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiSearchHandlerQuery query, QueryOptions options)
+        {
+            return basicServer.MultiSearchQuery(query, options);
+        }
     }
 }

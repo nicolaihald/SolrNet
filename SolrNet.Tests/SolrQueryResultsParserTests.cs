@@ -564,8 +564,35 @@ namespace SolrNet.Tests {
             Assert.IsTrue(mlt.ContainsKey(product2.Id));
             Assert.AreEqual(1, mlt[product1.Id].Count);
             Assert.AreEqual(1, mlt[product2.Id].Count);
-            //Console.WriteLine(mlt[product1.Id][0].Id);
         }
+
+  
+        [Test]
+        public void ParseMultiQueryResultsWithGrouping()
+        {
+            var mapper = new AttributesMappingManager();
+            var parser = new MultiSearchHandlerResponseParser<Product>(
+                new SolrDocumentResponseParser<Product>(mapper, new DefaultDocumentVisitor(mapper, new DefaultFieldParser()), new SolrDocumentActivator<Product>()));
+            var xml = EmbeddedResource.GetEmbeddedXml(GetType(), "Resources.responseWithMultiResultAndGroup.xml");
+
+            var results = new List<SolrQueryResults<Product>>();;
+            parser.Parse(xml, results);
+
+            var result1 = results[0];
+            var result2 = results[1];
+
+            Assert.AreEqual(1, result1.Grouping.Count);
+            Assert.AreEqual(3, result1.Grouping["HeadWordExact"].Groups.Count());
+            Assert.AreEqual(22, result1.Grouping["HeadWordExact"].Groups.First().NumFound);
+
+            Assert.AreEqual(1, result2.Grouping.Count);
+            Assert.AreEqual(2, result2.Grouping["HeadWordExact"].Groups.Count());
+            Assert.AreEqual(17, result2.Grouping["HeadWordExact"].Groups.First().NumFound);
+        }
+
+
+
+
 
         [Test]
         public void ParseStatsResults() {

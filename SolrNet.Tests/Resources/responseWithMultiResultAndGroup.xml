@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<response>
+
+  <lst name="grouped">
+    <lst name="HeadWordExact">
+      <int name="matches">68</int>
+      <int name="ngroups">14</int>
+      <arr name="groups">
+        <lst>
+          <str name="groupValue">sublim</str>
+          <result name="doclist" numFound="22" start="0">
+            <doc>
+              <str name="Id">1</str>
+              <str name="HeadWordExact">sublimere</str>
+            </doc>
+          </result>
+        </lst>
+        <lst>
+          <str name="groupValue">sublimering</str>
+          <result name="doclist" numFound="11" start="0">
+            <doc>
+              <str name="Id">56</str>
+              <str name="HeadWordExact">sublimering</str>
+            </doc>
+          </result>
+        </lst>
+        <lst>
+          <str name="groupValue">sublime</str>
+          <result name="doclist" numFound="3" start="0">
+            <doc>
+              <str name="Id">37</str>
+              <str name="HeadWordExact">sublim</str>
+            </doc>
+          </result>
+        </lst>
+      </arr>
+    </lst>
+  </lst>
+  <lst name="grouped">
+    <lst name="HeadWordExact">
+      <int name="matches">117</int>
+      <int name="ngroups">35</int>
+      <arr name="groups">
+        <lst>
+          <str name="groupValue">abe</str>
+          <result name="doclist" numFound="17" start="0">
+            <doc>
+              <str name="Id">89</str>
+              <str name="HeadWordExact">abe</str>
+            </doc>
+          </result>
+        </lst>
+        <lst>
+          <str name="groupValue">abe eft</str>
+          <result name="doclist" numFound="8" start="0">
+            <doc>
+              <str name="Id">16</str>
+              <str name="HeadWordExact">abe efter</str>
+            </doc>
+          </result>
+        </lst>
+      </arr>
+    </lst>
+  </lst>
+</response>

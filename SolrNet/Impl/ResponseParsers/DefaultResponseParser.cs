@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace SolrNet.Impl.ResponseParsers {
     public class DefaultResponseParser<T>: ISolrAbstractResponseParser<T> {
-        private readonly AggregateResponseParser<T> parser;
+        protected readonly AggregateResponseParser<T> parser;
 
         public DefaultResponseParser(ISolrDocumentResponseParser<T> docParser) {
             parser = new AggregateResponseParser<T>(new ISolrAbstractResponseParser<T>[] {

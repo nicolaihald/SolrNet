@@ -16,6 +16,10 @@ namespace SolrNet.Tests.Mocks {
             throw new NotImplementedException();
         }
 
+        public IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiSearchHandlerQuery query, QueryOptions options) {
+            throw new NotImplementedException();
+        }
+
         public ResponseHeader Ping() {
             throw new NotImplementedException();
         }
