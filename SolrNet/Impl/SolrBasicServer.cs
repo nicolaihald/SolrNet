@@ -144,9 +144,8 @@ namespace SolrNet.Impl {
         /// <param name="options">The query options.</param>
         /// <returns>A list of <see cref="SolrQueryResults{T}"/>.</returns>
         public IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiSearchHandlerQuery query, QueryOptions options)
-        {
+        {            
             return this.queryExecuter.Execute(query, options);
-
         }
     }
 }
