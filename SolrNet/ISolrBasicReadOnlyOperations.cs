@@ -41,7 +41,7 @@ namespace SolrNet {
         /// <param name="query">The queries.</param>
         /// <param name="options">The query options.</param>
         /// <returns>A list of <see cref="SolrQueryResults{T}"/>.</returns>
-        IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiSearchHandlerQuery query, QueryOptions options);
+        IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiHandlerQuery query, QueryOptions options);
 
         /// <summary>
         /// Executes a MoreLikeThisHandler query

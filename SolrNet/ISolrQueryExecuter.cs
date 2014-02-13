@@ -33,11 +33,12 @@ namespace SolrNet {
         SolrMoreLikeThisHandlerResults<T> Execute(SolrMLTQuery query, MoreLikeThisHandlerQueryOptions options);
 
         /// <summary>
-        /// Executes multiple queries in a single request using a multihandler query and returns multiple results.       
+        /// Executes a query containing multiple sub-queries (<see cref="SolrMultiHandlerQueryPart"/>'s) in a single request 
+        /// and returns multiple resultset (a resultset for each subquery).
         /// </summary>
-        /// <param name="query">A <see cref="SolrMultiSearchHandlerQuery"/> containing one or multiple queries.</param>
+        /// <param name="query">A <see cref="SolrMultiHandlerQuery"/> containing one or multiple queries.</param>
         /// <param name="options">The <see cref="QueryOptions"/> shared by all the wrapped queries.</param>
         /// <returns>A list of SolrQueryResults{T} - one resultset for each query.</returns>
-        IEnumerable<SolrQueryResults<T>> Execute(SolrMultiSearchHandlerQuery query, QueryOptions options);
+        IEnumerable<SolrQueryResults<T>> Execute(SolrMultiHandlerQuery query, QueryOptions options);
 	}
 }

@@ -287,7 +287,7 @@ namespace SolrNet.Impl {
             return basicServer.MoreLikeThis(query, options);
         }
 
-        public IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiSearchHandlerQuery query, QueryOptions options)
+        public IEnumerable<SolrQueryResults<T>> MultiSearchQuery(SolrMultiHandlerQuery query, QueryOptions options)
         {
             return basicServer.MultiSearchQuery(query, options);
         }

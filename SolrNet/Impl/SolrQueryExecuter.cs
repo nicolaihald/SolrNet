@@ -63,7 +63,7 @@ namespace SolrNet.Impl
         /// <summary>
         /// Default Solr handler for Multi queries.
         /// </summary>
-        public static readonly string DefaultMultiSearchHandler = "/multi";
+        public static readonly string DefaultMultiHandler = "/multi";
 
         /// <summary>
         /// Solr query request handler to use. By default "/select"
@@ -255,7 +255,7 @@ namespace SolrNet.Impl
         /// <param name="query"></param>
         /// <param name="sharedOptions"></param>
         /// <returns></returns>
-        public IEnumerable<KeyValuePair<string, string>> GetMultiSearchHandlerParameters(SolrMultiSearchHandlerQuery query, QueryOptions sharedOptions)
+        public IEnumerable<KeyValuePair<string, string>> GetMultiSearchHandlerParameters(SolrMultiHandlerQuery query, QueryOptions sharedOptions)
         {
             var queryParts = query.Parts.ToList();
 
@@ -276,10 +276,14 @@ namespace SolrNet.Impl
             foreach (var p in GetCommonParameters(sharedOptions))
                 yield return p;
 
+            foreach (var p in GetGroupingQueryOptions(sharedOptions))
+                yield return p;
+
+            if (sharedOptions.OrderBy != null && sharedOptions.OrderBy.Count > 0)
+                yield return KV.Create("sort", string.Join(",", sharedOptions.OrderBy.Select(x => x.ToString()).ToArray()));
+
         }
-
-
-
+        
         /// <summary>
         /// Gets Solr parameters for facet queries
         /// </summary>
@@ -716,15 +720,17 @@ namespace SolrNet.Impl
         /// <summary>
         /// Executes MultiSearch handler query (multiple queries in a single request) and returns multiple results.       
         /// </summary>
-        /// <param name="query">A <see cref="SolrMultiSearchHandlerQuery"/> containing one or multiple queries.</param>
+        /// <param name="query">A <see cref="SolrMultiHandlerQuery"/> containing one or multiple queries.</param>
         /// <param name="sharedOptions">The <see cref="QueryOptions"/> shared by all the wrapped queries.</param>
         /// <returns>A list of SolrQueryResults{T} - one resultset for each query.</returns>
-        public IEnumerable<SolrQueryResults<T>> Execute(SolrMultiSearchHandlerQuery query, QueryOptions sharedOptions)
+        public IEnumerable<SolrQueryResults<T>> Execute(SolrMultiHandlerQuery query, QueryOptions sharedOptions)
         {
             var results     = new List<SolrQueryResults<T>>();
-            var handler     = GetRequestHandlerOverrideOrUseDefault(sharedOptions, DefaultMultiSearchHandler);
+            var handler     = GetRequestHandlerOverrideOrUseDefault(sharedOptions, DefaultMultiHandler);
             var parameters  = GetMultiSearchHandlerParameters(query, sharedOptions);
             
+
+
             var r = connection.Get(handler, parameters);
             var xml = XDocument.Parse(r);
             multiSearchResultParser.Parse(xml, results);

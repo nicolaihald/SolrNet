@@ -151,9 +151,10 @@
     <Compile Include="Impl\ResponseParsers\GroupingResponseParser.cs" />
     <Compile Include="SolrFacetPivotQuery.cs" />
     <Compile Include="SolrMoreLikeThisHandlerQuery.cs" />
-    <Compile Include="SolrMultiSearchHandlerQuery.cs" />
+    <Compile Include="SolrMultiHandlerQuery.cs" />
     <Compile Include="SolrMoreLikeThisHandlerStreamBodyQuery.cs" />
     <Compile Include="SolrMoreLikeThisHandlerStreamUrlQuery.cs" />
+    <Compile Include="SolrMultiHandlerQueryPart.cs" />
     <Compile Include="SolrQueryByDistance.cs" />
     <Compile Include="SolrDIHStatus.cs" />
     <Compile Include="Impl\SolrDIHStatusParser.cs" />
