@@ -10,7 +10,8 @@ open System.Xml.Linq
 open Fake
 open Fake.FileUtils
 
-let version = "0.4.0.2002"
+let version = "0.5.0.1002"
+let nugetVersion = "0.5.0-alpha2"
 let buildDir = "merged"
 let nugetDir = "nuget"
 let nugetDocs = nugetDir @@ "content"
@@ -33,7 +34,7 @@ let slnBuild sln x =
 let mainSln = slnBuild "solrnet.sln"
 let sampleSln = slnBuild "SampleSolrApp.sln"
 
-let nuGetBuild = Nu.build version
+let nuGetBuild = Nu.build nugetVersion
 
 Target "Clean" <| fun _ -> 
     mainSln "Clean"
@@ -44,16 +45,16 @@ Target "Clean" <| fun _ ->
 Target "Build" <| fun _ -> mainSln "Rebuild"
 Target "BuildSample" <| fun _ -> sampleSln "Rebuild"
 
-let libs = ["SolrNet"; "SolrNet.DSL"; "HttpWebAdapters"; "Castle.Facilities.SolrNetIntegration"; "Ninject.Integration.SolrNet"; "NHibernate.SolrNet"; "StructureMap.SolrNetIntegration"; "AutofacContrib.SolrNet"; "Unity.SolrNetIntegration"]
+let libs = ["SolrNet"; "SolrNet.DSL"; "HttpWebAdapters"; "Castle.Facilities.SolrNetIntegration"; "Ninject.Integration.SolrNet"; "StructureMap.SolrNetIntegration"; "AutofacContrib.SolrNet"; "Unity.SolrNetIntegration"; "NHibernate.SolrNet"]
 let dlls = [for l in libs -> l + ".dll"]
 let dirs = [for l in libs -> l @@ "bin" @@ config]
 
 let testAssemblies = !! ("**/bin/"+config+"/*Tests.dll") |> Seq.distinctBy (fun p -> p.Split [|'/';'\\'|] |> System.Linq.Enumerable.Last)
 let noIntegrationTests = "exclude Category: Integration"
 let onlyIntegrationTests = "Category: Integration"
-let testTargets = List.map (fun lib -> "Test." + lib) libs
+let testTargets = List.map (fun lib -> "Test." + lib) libs |> List.filter (fun l -> not (l.Contains "NHibernate"))
 
-for lib,target in List.zip libs testTargets do
+for lib,target in Seq.zip libs testTargets do
     Target target <| fun _ ->
         !! (lib+".Tests/bin/"+config+"/"+lib+".Tests.dll")
             |> Gallio.Run (fun p -> { p with Filters = noIntegrationTests })
@@ -107,15 +108,17 @@ Target "Docs" <| fun _ ->
     rm_rf docsDir
     let r = Shell.Exec(@"tools\doxygen\doxygen.exe")
     if r <> 0 then failwith "Doxygen failed"
-    rm docsFile
-    Rename docsFile (docsDir @@ "html\\index.chm")
+    if File.Exists docsFile then
+        rm docsFile
+        Rename docsFile (docsDir @@ "html\\index.chm")
     rm_rf docsDir
 
 Target "NuGet" <| fun _ ->
     rm_rf nugetDir
     mkdir nugetDocs
     mkdir nugetLib
-    cp docsFile nugetDocs
+    if File.Exists docsFile then
+        cp docsFile nugetDocs
     !!(buildDir @@ "SolrNet.*") |> Copy nugetLib
     nuGetBuild "SolrNet" "Apache Solr client" ["CommonServiceLocator", "[1.0]"]
 
@@ -125,7 +128,7 @@ let nuGetSingle dir =
     !!(dir @@ "bin" @@ config @@ (dir + ".*")) |> Copy nugetLib
     nuGetBuild 
 
-let solrNetDep = "SolrNet", "[" + version + "]"
+let solrNetDep = "SolrNet", "[" + nugetVersion + "]"
 
 Target "NuGet.Windsor" <| fun _ ->
     nuGetSingle 
@@ -245,6 +248,7 @@ Target "BuildAndRelease" DoNothing
 Target "NuGet.All" DoNothing
 Target "All" DoNothing
 Target "Test" DoNothing
+Target "TestAndNuGet" DoNothing
 
 "Test" <== ["BuildAll"] @ testTargets
 "BuildAll" <== ["Build";"Merge";"BuildSample"]
@@ -252,6 +256,7 @@ Target "Test" DoNothing
 "TestAndRelease" <== ["Clean";"Version";"Test";"ReleasePackage"]
 "NuGet" <== ["Clean";"Build";"BasicMerge";"Docs"]
 "NuGet.All" <== (getAllTargetsNames() |> List.filter ((<*) "NuGet") |> List.filter ((<>) "NuGet.All") |> List.sort)
+"TestAndNuGet" <== ["Clean";"Version"; "Test"; "NuGet.All"]
 "All" <== ["BuildAndRelease";"PackageSampleApp";"NuGet.All"]
 
 Run target

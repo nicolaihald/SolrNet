@@ -81,6 +81,13 @@ namespace SolrNet.Tests {
 			Assert.AreEqual(1, r.NumFound);
 		}
 
+        [Test]
+        public void CanParseNextCursormark()
+        {
+            var r = ParseFromResource<TestDocument>("Resources.response.xml");
+            Assert.AreEqual(new StartOrCursor.Cursor("AoEoZTQ3YmY0NDM="), r.NextCursorMark);
+        }
+
 		[Test]
 		public void Parse() {
 		    var results = ParseFromResource<TestDocument>("Resources.response.xml");
@@ -406,11 +413,10 @@ namespace SolrNet.Tests {
         }
 
         private static IDictionary<string, HighlightedSnippets> ParseHighlightingResults(string rawXml) {
-            var parser = new HighlightingResponseParser<Product>();
             var xml = XDocument.Parse(rawXml);
             var docNode = xml.XPathSelectElement("response/lst[@name='highlighting']");
             var item = new Product { Id = "SP2514N" };
-            return parser.ParseHighlighting(new SolrQueryResults<Product> { item }, docNode);
+            return HighlightingResponseParser<Product>.ParseHighlighting(new SolrQueryResults<Product> { item }, docNode);
         }
 
         [Test]
@@ -458,6 +464,15 @@ namespace SolrNet.Tests {
             //foreach (var i in first.Value.Snippets["source_en"])
             //    Console.WriteLine(i);
             Assert.AreEqual(3, first.Value.Snippets["source_en"].Count);
+        }
+
+        [Test]
+        public void ParseHighlighting3() {
+            var highlights = ParseHighlightingResults(EmbeddedResource.GetEmbeddedString(GetType(), "Resources.responseWithHighlighting3.xml"));
+            Assert.AreEqual(0, highlights["e4420cc2"].Count);
+            Assert.AreEqual(1, highlights["e442c4cd"].Count);
+            Assert.AreEqual(1, highlights["e442c4cd"]["bodytext"].Count);
+            Assert.Contains(highlights["e442c4cd"]["bodytext"].First(), "Garia lancerer");
         }
         
         [Test]
@@ -573,7 +588,7 @@ namespace SolrNet.Tests {
             var xml = EmbeddedResource.GetEmbeddedXml(GetType(), "Resources.responseWithStats.xml");
             var docNode = xml.XPathSelectElement("response/lst[@name='stats']");
             var stats = parser.ParseStats(docNode, "stats_fields");
-            Assert.AreEqual(1, stats.Count);
+            Assert.AreEqual(2, stats.Count);
             Assert.IsTrue(stats.ContainsKey("price"));
             var priceStats = stats["price"];
             Assert.AreEqual(0.0, priceStats.Min);
@@ -608,6 +623,38 @@ namespace SolrNet.Tests {
             Assert.AreEqual(5385249.905200001, priceInStockTrueStats.SumOfSquares);
             Assert.AreEqual(371.8072727272727, priceInStockTrueStats.Mean);
             Assert.AreEqual(621.6592938755265, priceInStockTrueStats.StdDev);
+
+            var zeroResultsStats = stats["zeroResults"];
+            Assert.AreEqual(double.NaN, zeroResultsStats.Min);
+            Assert.AreEqual(double.NaN, zeroResultsStats.Max);
+            Assert.AreEqual(0, zeroResultsStats.Count);
+            Assert.AreEqual(0, zeroResultsStats.Missing);
+            Assert.AreEqual(0.0, zeroResultsStats.Sum);
+            Assert.AreEqual(0.0, zeroResultsStats.SumOfSquares);
+            Assert.AreEqual(double.NaN, zeroResultsStats.Mean);
+            Assert.AreEqual(0.0, zeroResultsStats.StdDev);
+        }
+
+        [Test]
+        public void ParseStatsResults2() {
+            var xml = EmbeddedResource.GetEmbeddedXml(GetType(), "Resources.partialResponseWithStats.xml");
+            var parser = new StatsResponseParser<Product>();
+            var stats = parser.ParseStats(xml.Root, "stats_fields");
+
+            Assert.IsNotNull(stats);
+            Assert.Contains(stats.Keys, "instock_prices");
+            Assert.Contains(stats.Keys, "all_prices");
+
+            var instock = stats["instock_prices"];
+            Assert.AreEqual(0, instock.Min);
+            Assert.AreEqual(2199, instock.Max);
+            Assert.AreEqual(16, instock.Count);
+            Assert.AreEqual(16, instock.Missing);
+            Assert.AreEqual(5251.270030975342, instock.Sum);
+
+            var all = stats["all_prices"];
+            Assert.AreEqual(4089.880027770996, all.Sum);
+            Assert.AreEqual(2199, all.Max);
         }
 
         [Test]
